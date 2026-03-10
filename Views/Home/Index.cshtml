@@ -1,26 +1,43 @@
 ﻿<main>
-    <section class="row" aria-labelledby="aspnetTitle">
-        <h1 id="aspnetTitle">ASP.NET</h1>
-        <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS, and JavaScript.</p>
-        <p><a href="https://asp.net" class="btn btn-primary btn-md">Learn more &raquo;</a></p>
-    </section>
-    <div class="row">
-        <section class="col-md-4" aria-labelledby="gettingStartedTitle">
-            <h2 id="gettingStartedTitle">Getting started</h2>
-            <p>ASP.NET Web API is a framework that makes it easy to build HTTP services that reach
-            a broad range of clients, including browsers and mobile devices. ASP.NET Web API
-            is an ideal platform for building RESTful applications on the .NET Framework.</p>
-            <p><a class="btn btn-outline-dark" href="https://go.microsoft.com/fwlink/?LinkId=301870">Learn more &raquo;</a></p>
+    <div class="jumbotron shadow-sm rounded bg-light p-5 mt-4 text-center">
+        <h1 class="display-4 text-primary fw-bold" id="appTitle">Sage 300 IGA Wrapper</h1>
+        <p class="lead mt-3 text-secondary">
+            A comprehensive RESTful web API layer enabling seamless Identity Governance and Administration capabilities for Sage 300.
+        </p>
+        <hr class="my-4">
+        <p>Integrate your enterprise identity systems (like SailPoint, Okta, etc.) directly with Sage 300 user security, session management, and access controls.</p>
+        <p class="mt-4">
+            <a href="/api/users" class="btn btn-primary btn-lg rounded-pill shadow-sm px-4 py-2 me-2">Explore API endpoints</a>
+            <a href="/Help" class="btn btn-outline-secondary btn-lg rounded-pill px-4 py-2">View Documentation</a>
+        </p>
+    </div>
+
+    <div class="row mt-5">
+        <section class="col-md-4 mb-4" aria-labelledby="provisioningTitle">
+            <div class="card h-100 border-0 shadow-sm rounded-lg p-3">
+                <div class="card-body">
+                    <h2 class="h4 text-dark mb-3" id="provisioningTitle">Automated Provisioning</h2>
+                    <p class="text-muted">Streamline onboarding and offboarding. Create, update, or disable Sage 300 users and manage their security group assignments programmatically through REST calls.</p>
+                </div>
+            </div>
         </section>
-        <section class="col-md-4" aria-labelledby="librariesTitle">
-            <h2 id="librariesTitle">Get more libraries</h2>
-            <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-            <p><a class="btn btn-outline-dark" href="https://go.microsoft.com/fwlink/?LinkId=301871">Learn more &raquo;</a></p>
+        
+        <section class="col-md-4 mb-4" aria-labelledby="governanceTitle">
+            <div class="card h-100 border-0 shadow-sm rounded-lg p-3">
+                <div class="card-body">
+                    <h2 class="h4 text-dark mb-3" id="governanceTitle">Access Governance</h2>
+                    <p class="text-muted">Perform real-time access reviews. Extract comprehensive lists of users, groups, and functional authorizations to maintain regulatory compliance and enforce least privilege.</p>
+                </div>
+            </div>
         </section>
-        <section class="col-md-4" aria-labelledby="hostingTitle">
-            <h2 id="hostingTitle">Web Hosting</h2>
-            <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-            <p><a class="btn btn-outline-dark" href="https://go.microsoft.com/fwlink/?LinkId=301872">Learn more &raquo;</a></p>
-        </section>>
+        
+        <section class="col-md-4 mb-4" aria-labelledby="architectureTitle">
+            <div class="card h-100 border-0 shadow-sm rounded-lg p-3">
+                <div class="card-body">
+                    <h2 class="h4 text-dark mb-3" id="architectureTitle">Robust Architecture</h2>
+                    <p class="text-muted">Built on ASP.NET Web API and the proven Sage 300 COM SDK. Safely manages COM sessions, threading, and data dictionary interactions behind a modern HTTP frontend.</p>
+                </div>
+            </div>
+        </section>
     </div>
 </main>

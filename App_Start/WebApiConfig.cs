@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
+using Newtonsoft.Json.Converters;
 
 namespace AccpacUserManagement_Wrapper
 {
@@ -13,6 +14,9 @@ namespace AccpacUserManagement_Wrapper
 
             // Web API routes
             config.MapHttpAttributeRoutes();
+
+            config.Formatters.JsonFormatter.SerializerSettings.Converters
+           .Add(new StringEnumConverter());
 
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",

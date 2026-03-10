@@ -8,6 +8,7 @@ using System.Web.Http.Description;
 using System.Web.Mvc;
 using AccpacUserManagement_Wrapper.Models;
 using AccpacUserManagement_Wrapper.Services.Sage300Services;
+using HttpGetAttribute = System.Web.Http.HttpGetAttribute;
 using RouteAttribute = System.Web.Http.RouteAttribute;
 using RoutePrefixAttribute = System.Web.Http.RoutePrefixAttribute;
 
@@ -34,12 +35,48 @@ namespace AccpacUserManagement_Wrapper.Controllers
         [System.Web.Http.HttpGet]
         [Route("")]
         [ResponseType(typeof(List<UserDto>))]
-        public async Task<IHttpActionResult> GetCustomers()
+        public async Task<IHttpActionResult> getUsers()
         {
             try
             {
                 var users = await userService.GetUsersAsync();
                 return Ok(users);
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
+        }
+
+
+        /// <summary>
+        /// Gets a specific user by ID.
+        /// </summary>
+        /// <param name="id">The customer ID.</param>
+        /// <returns>The customer details.</returns>
+        /// <response code="200">Returns the customer</response>
+        /// <response code="404">If the customer is not found</response>
+        /// <response code="500">If there is an internal server error</response>
+        [HttpGet]
+        [Route("{id}")]
+        [ResponseType(typeof(UserDto))]
+        public async Task<IHttpActionResult> getUser(string id)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(id))
+                {
+                    return BadRequest("User ID is required");
+                }
+
+                var user = await userService.GetUserByIdAsync(id);
+
+                if (user == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(user);
             }
             catch (Exception ex)
             {

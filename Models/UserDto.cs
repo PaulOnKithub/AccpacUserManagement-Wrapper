@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Web;
+using Newtonsoft.Json;
+using JsonConverter = System.Text.Json.Serialization.JsonConverter;
+using JsonConverterAttribute = System.Text.Json.Serialization.JsonConverterAttribute;
 
 namespace AccpacUserManagement_Wrapper.Models
 {
@@ -9,6 +13,7 @@ namespace AccpacUserManagement_Wrapper.Models
     public enum AccountType
     {
         User = 0,
+        Administrator = 1,
         Timecard = 2
     }
 
@@ -78,9 +83,12 @@ namespace AccpacUserManagement_Wrapper.Models
         public string Password { get; set; }
 
         public AccountType AccountType { get; set; }  // ACCTTYPE
+
         public AccountStatus AccountStatus { get; set; } // ACCTSTATUS
 
         public string LanguageCode { get; set; }      // LANGUAGE (String*3)
+
+
         public Language Language { get; set; }        // LANGLIST
 
         public bool MustChangePassword { get; set; }  // CHNGEPASS
@@ -118,6 +126,7 @@ namespace AccpacUserManagement_Wrapper.Models
         public bool OptInEmail { get; set; }          // OPTIN
 
         public string LocaleId { get; set; }
+
         public LocaleList Locale { get; set; }
 
         public string Office365UserName { get; set; } // O365USRNAM

@@ -124,7 +124,7 @@ namespace AccpacUserManagement_Wrapper.Services.Sage300Services
             });
         }
 
-        internal async Task<UserDto> GetUserByIdAsync(string id)
+        public async Task<UserDto> GetUserByIdAsync(string id)
         {
             return await Sage300TaskExecutor.Instance.ExecuteAsync(() =>
             {
@@ -223,5 +223,42 @@ namespace AccpacUserManagement_Wrapper.Services.Sage300Services
 
         }
 
+        public async Task<UserDto> CreateUser(UserDto user)
+        {
+            return await Sage300TaskExecutor.Instance.ExecuteAsync(() =>
+            {
+                Debug.WriteLine("CreateUser executing on thread: " + System.Threading.Thread.CurrentThread.ManagedThreadId);
+
+                try
+                {
+                    var dbLink = Sage300SessionManager.Instance.GetSystemDBLink();
+                    var view = dbLink.OpenView("AS0003");
+
+                    view.Fields.FieldByName("USERID").SetValue(user.UserId, false);
+                    view.Fields.FieldByName("USERNAME").SetValue(user.UserName, false);
+                    view.Fields.FieldByName("PASSWORD").SetValue(user.Password, false);
+
+                    view.Insert();
+                    view.Dispose();
+
+                    //sanitize use password
+                    user.Password = "******************";
+
+                    return user;
+
+                }
+                catch(Exception ex)
+                {
+                    Debug.WriteLine($"Error creating a new user: {ex.Message}");
+                    var accpacError = Sage300SessionManager.Instance.accpacSessionErrorsHandler(ex);
+                    throw new InvalidOperationException($"Failed to create user with id {user.UserId} \n Accapc Error {accpacError.ToString()}",ex);
+                }
+
+            });
+
+        }
+
     }
+
+
 }

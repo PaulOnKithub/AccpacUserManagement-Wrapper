@@ -9,6 +9,7 @@ using System.Web.Mvc;
 using AccpacUserManagement_Wrapper.Models;
 using AccpacUserManagement_Wrapper.Services.Sage300Services;
 using HttpGetAttribute = System.Web.Http.HttpGetAttribute;
+using HttpPostAttribute = System.Web.Http.HttpPostAttribute;
 using RouteAttribute = System.Web.Http.RouteAttribute;
 using RoutePrefixAttribute = System.Web.Http.RoutePrefixAttribute;
 
@@ -81,6 +82,56 @@ namespace AccpacUserManagement_Wrapper.Controllers
             catch (Exception ex)
             {
                 return InternalServerError(ex);
+            }
+        }
+
+
+        [HttpPost]
+        [Route("")]
+        [ResponseType(typeof(UserDto))]
+        public async Task<IHttpActionResult> CreateCustomer([FromBody] UserDto user)
+        {
+            try
+            {
+                if (user == null)
+                {
+                    return BadRequest("User data is required");
+                }
+
+                if (string.IsNullOrWhiteSpace(user.UserId))
+                {
+                    return BadRequest("User ID is required");
+                }
+
+                if (string.IsNullOrWhiteSpace(user.UserName))
+                {
+                    return BadRequest("User Name is required");
+                }
+
+                if (string.IsNullOrWhiteSpace(user.Password))
+                {
+                    return BadRequest("Password is required");
+                }
+
+                var createdUser = await userService.CreateUser(user);
+
+                return Created(
+                    new Uri(Request.RequestUri + "/" + createdUser.UserId),
+                    createdUser
+                );
+            }
+            catch (InvalidOperationException ex) when (ex.Message.Contains("already exists"))
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (InvalidOperationException ex) when (ex.Message.Contains("must include"))
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+
             }
         }
 

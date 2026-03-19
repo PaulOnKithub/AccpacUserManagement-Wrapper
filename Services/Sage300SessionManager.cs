@@ -16,6 +16,7 @@ namespace AccpacUserManagement_Wrapper.Services
 
         private Session _session;
         private DBLink _dbLink;
+        private DBLink _systemDbLink;
         private bool _disposed = false;
         private readonly object _lockObject = new object();
 
@@ -74,6 +75,7 @@ namespace AccpacUserManagement_Wrapper.Services
 
                     // Open database link
                     _dbLink = _session.OpenDBLink(DBLinkType.Company, DBLinkFlags.ReadWrite);
+                    _systemDbLink=_session.OpenDBLink(DBLinkType.System, DBLinkFlags.ReadWrite);
 
                     Debug.WriteLine("Sage300 Session initialized successfully");
                 }
@@ -123,6 +125,15 @@ namespace AccpacUserManagement_Wrapper.Services
             return _dbLink;
         }
 
+        public DBLink GetSystemDBLink()
+        {
+            if (_systemDbLink == null)
+            {
+                throw new InvalidOperationException("Sage 300 system database link not initialized. Call Initialize() first.");
+            }
+            return _systemDbLink;
+        }
+
         public AccpacErrorDto accpacSessionErrorsHandler(Exception ex)
         {
 
@@ -136,28 +147,35 @@ namespace AccpacUserManagement_Wrapper.Services
             {
                 long count = _session.Errors.Count;
                 int i = 0;
+                AccpacErrorDto returnValue = null;
                 while (count > 0)
                 {
                     switch (_session.Errors[i].Priority)
                     {
                         case ErrorPriority.Error:
-                            return new AccpacErrorDto { Message = _session.Errors[i].Message, Source = _session.Errors[i].Message };
+                            returnValue=new AccpacErrorDto { Message = _session.Errors[i].Message, Source = _session.Errors[i].Message };
                             break;
+                         
                         case ErrorPriority.Message:
-                            return new AccpacErrorDto { Message = _session.Errors[i].Message, Source = _session.Errors[i].Message };
+                            returnValue = new AccpacErrorDto { Message = _session.Errors[i].Message, Source = _session.Errors[i].Message };
                             break;
+
                         case ErrorPriority.Security:
-                            return new AccpacErrorDto { Message = _session.Errors[i].Message, Source = _session.Errors[i].Message };
+                            returnValue = new AccpacErrorDto { Message = _session.Errors[i].Message, Source = _session.Errors[i].Message };
                             break;
+
                         case ErrorPriority.SevereError:
-                            return new AccpacErrorDto { Message = _session.Errors[i].Message, Source = _session.Errors[i].Message };
+                            returnValue = new AccpacErrorDto { Message = _session.Errors[i].Message, Source = _session.Errors[i].Message };
                             break;
+
                         case ErrorPriority.Warning:
-                            return new AccpacErrorDto { Message = _session.Errors[i].Message, Source = _session.Errors[i].Message };
+                            returnValue = new AccpacErrorDto { Message = _session.Errors[i].Message, Source = _session.Errors[i].Message };
                             break;
+
                         default:
-                            return new AccpacErrorDto { Message = _session.Errors[i].Message, Source = _session.Errors[i].Message };
+                            returnValue = new AccpacErrorDto { Message = _session.Errors[i].Message, Source = _session.Errors[i].Message };
                             break;
+
                     }
 
                     count--;
@@ -165,6 +183,7 @@ namespace AccpacUserManagement_Wrapper.Services
                 }
 
                 _session.Errors.Clear();
+                return returnValue;
             }
             return new AccpacErrorDto { Message = ex.Message, Source = "Non-Accpac Error" };
         }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
@@ -16,13 +17,13 @@ namespace AccpacUserManagement_Wrapper.Services.Sage300Services
         /// Retrieves all users from Sage 300.
         /// </summary>
         /// <returns>A list of user DTOs.</returns>
-        public async Task<List<UserDto>> GetUsersAsync()
+        public async Task<List<UserAttributesDto>> GetUsersAsync()
         {
             return await Sage300TaskExecutor.Instance.ExecuteAsync(() =>
             {
                 Debug.WriteLine("GetUsersAsync executing on thread: " + System.Threading.Thread.CurrentThread.ManagedThreadId);
 
-                var users = new List<UserDto>();
+                var users = new List<UserAttributesDto>();
 
                 try
                 {
@@ -37,7 +38,7 @@ namespace AccpacUserManagement_Wrapper.Services.Sage300Services
 
                     while (view.Fetch(false))
                     {
-                        var user = new UserDto
+                        var user = new UserAttributesDto
                         {
                             UserId = view.Fields.FieldByName("USERID").Value?.ToString(),
                             UserName = view.Fields.FieldByName("USERNAME").Value?.ToString(),
@@ -125,12 +126,12 @@ namespace AccpacUserManagement_Wrapper.Services.Sage300Services
             });
         }
 
-        public async Task<UserDto> GetUserByIdAsync(string id)
+        public async Task<UserAttributesDto> GetUserByIdAsync(string id)
         {
             return await Sage300TaskExecutor.Instance.ExecuteAsync(() =>
             {
                 Debug.WriteLine("GetUserByIdAsync executing on thread: " + System.Threading.Thread.CurrentThread.ManagedThreadId);
-                UserDto user = null;
+                UserAttributesDto user = null;
                 try
                 {
                     var dbLink = Sage300SessionManager.Instance.GetDBLink();
@@ -142,7 +143,7 @@ namespace AccpacUserManagement_Wrapper.Services.Sage300Services
 
                     if (found)
                     {
-                        user = new UserDto
+                        user = new UserAttributesDto
                         {
                             UserId = view.Fields.FieldByName("USERID").Value.ToString(),
                             UserName = view.Fields.FieldByName("USERNAME").Value.ToString(),
@@ -224,7 +225,7 @@ namespace AccpacUserManagement_Wrapper.Services.Sage300Services
 
         }
 
-        public async Task<UserDto> CreateUser(UserDto user)
+        public async Task<UserAttributesDto> CreateUser(UserAttributesDto user)
         {
             return await Sage300TaskExecutor.Instance.ExecuteAsync(() =>
             {
@@ -341,10 +342,97 @@ namespace AccpacUserManagement_Wrapper.Services.Sage300Services
             });
         }
 
-        internal async Task<object> GetUserRolesAsync()
+        internal async Task<List<RolesDto>> GetUserRolesAsync()
         {
-            throw new NotImplementedException();
+            return await Sage300TaskExecutor.Instance.ExecuteAsync(() =>
+            {
+                Debug.WriteLine("GetUserRolesAsync executing on thread: " + System.Threading.Thread.CurrentThread.ManagedThreadId);
+                var userRoles = new List<RolesDto>();
+                try
+                {
+                    var dbLink = Sage300SessionManager.Instance.GetSystemDBLink();
+                    var view = dbLink.OpenView("AS0001");
+                    view.Browse("PGMVER = 71A AND  RESOURCEID=\"\" ", true);
+                    while (view.Fetch(false))
+                    {
+                        var userRole = new RolesDto
+                        {
+                            ProgramId = view.Fields.FieldByName("PGMID").Value?.ToString(),
+                            ProgramVersion = view.Fields.FieldByName("PGMVER").Value?.ToString(),
+                            GroupId = view.Fields.FieldByName("PROFILEID").Value?.ToString(),
+                            ResourceId = view.Fields.FieldByName("RESOURCEID").Value?.ToString(),
+                            GroupDescription = view.Fields.FieldByName("PROFDESC").Value?.ToString()
+                        };
+                        userRoles.Add(userRole);
+                    }
+                    view.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Error retrieving roles: {ex.Message}");
+                    var accpacError = Sage300SessionManager.Instance.accpacSessionErrorsHandler(ex);
+                    throw new InvalidOperationException($"Failed to retrive roles from Sage 300 \n Accpac Error {accpacError.ToString()}", ex);
+                }
+                return userRoles;
+             });
         }
+
+        public async Task<List<UserRolesDto>> GetUserRoles()
+        {
+            return await Sage300TaskExecutor.Instance.ExecuteAsync(() =>
+            {
+                var userRolesMap = new Dictionary<string, UserRolesDto>();
+                try
+                {
+                    var dbLink = Sage300SessionManager.Instance.GetSystemDBLink();
+                    using (var view = dbLink.OpenView("AS0002"))
+                    {
+                        view.Browse("", true);
+
+                        while (view.Fetch(false))
+                        {
+                            var userId = view.Fields.FieldByName("USERID").Value?.ToString();
+
+                            if (string.IsNullOrWhiteSpace(userId))
+                                continue;
+
+                            if (!userRolesMap.TryGetValue(userId, out var userDto))
+                            {
+                                userDto = new UserRolesDto
+                                {
+                                    UserId = userId,
+                                    Roles = new List<RolesDto>()
+                                };
+
+                                userRolesMap[userId] = userDto;
+                            }
+
+                            var role = new RolesDto
+                            {
+                                ProgramId = view.Fields.FieldByName("PGMID").Value?.ToString(),
+                                ProgramVersion = "71A",
+                                GroupId = view.Fields.FieldByName("PROFILEID").Value?.ToString()
+                            };
+
+                            userDto.Roles.Add(role);
+                        }
+
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Error retrieving user roles: {ex.Message}");
+                    var accpacError = Sage300SessionManager.Instance.accpacSessionErrorsHandler(ex);
+                    throw new InvalidOperationException($"Failed to retrive user roles from Sage 300 \n Accpac Error {accpacError.ToString()}", ex);
+
+                }
+                return userRolesMap.Values.ToList();
+            });
+        }
+
+
+
+
     }
 
     

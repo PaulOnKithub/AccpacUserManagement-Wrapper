@@ -36,7 +36,7 @@ namespace AccpacUserManagement_Wrapper.Controllers
         /// <response code="500">If there is an internal server error</response>
         [System.Web.Http.HttpGet]
         [Route("")]
-        [ResponseType(typeof(List<UserDto>))]
+        [ResponseType(typeof(List<UserAttributesDto>))]
         public async Task<IHttpActionResult> getUsers()
         {
             try
@@ -61,7 +61,7 @@ namespace AccpacUserManagement_Wrapper.Controllers
         /// <response code="500">If there is an internal server error</response>
         [HttpGet]
         [Route("{id}")]
-        [ResponseType(typeof(UserDto))]
+        [ResponseType(typeof(UserAttributesDto))]
         public async Task<IHttpActionResult> getUser(string id)
         {
             try
@@ -89,8 +89,8 @@ namespace AccpacUserManagement_Wrapper.Controllers
 
         [HttpPost]
         [Route("")]
-        [ResponseType(typeof(UserDto))]
-        public async Task<IHttpActionResult> CreateCustomer([FromBody] UserDto user)
+        [ResponseType(typeof(UserAttributesDto))]
+        public async Task<IHttpActionResult> CreateCustomer([FromBody] UserAttributesDto user)
         {
             try
             {
@@ -195,7 +195,7 @@ namespace AccpacUserManagement_Wrapper.Controllers
 
         [HttpGet]
         [Route("roles")]
-        [ResponseType(typeof(List<UserRolesDto>))]
+        [ResponseType(typeof(List<RolesDto>))]
         public async Task<IHttpActionResult> getUserRoles()
         {
             try
@@ -209,6 +209,22 @@ namespace AccpacUserManagement_Wrapper.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("userroles")]
+        [ResponseType(typeof(List<UserRolesDto>))]
+        public async Task<IHttpActionResult> getUsersWithRoles()
+        {
+            try
+            {
+                var usersWithRoles = await userService.GetUserRoles();
+                return Ok(usersWithRoles);
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
+
+        }
     }
 
 

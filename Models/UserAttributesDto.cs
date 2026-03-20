@@ -74,7 +74,7 @@ namespace AccpacUserManagement_Wrapper.Models
         SpanishSpain = 10,
         FrenchCanada = 11
     }
-    public class UserDto
+    public class UserAttributesDto
     {
         public string UserId { get; set; }            // USERID (String*8)
         public string UserName { get; set; }          // USERNAME (String*60)

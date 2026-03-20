@@ -153,27 +153,27 @@ namespace AccpacUserManagement_Wrapper.Services
                     switch (_session.Errors[i].Priority)
                     {
                         case ErrorPriority.Error:
-                            returnValue=new AccpacErrorDto { Message = _session.Errors[i].Message, Source = _session.Errors[i].Message };
+                            returnValue=new AccpacErrorDto {Priority="ERROR", Message = _session.Errors[i].Message, Source = _session.Errors[i].Message };
                             break;
                          
                         case ErrorPriority.Message:
-                            returnValue = new AccpacErrorDto { Message = _session.Errors[i].Message, Source = _session.Errors[i].Message };
+                            returnValue = new AccpacErrorDto {Priority="MESSAGE" ,Message = _session.Errors[i].Message, Source = _session.Errors[i].Message };
                             break;
 
                         case ErrorPriority.Security:
-                            returnValue = new AccpacErrorDto { Message = _session.Errors[i].Message, Source = _session.Errors[i].Message };
+                            returnValue = new AccpacErrorDto {Priority="SECURITY" ,Message = _session.Errors[i].Message, Source = _session.Errors[i].Message };
                             break;
 
                         case ErrorPriority.SevereError:
-                            returnValue = new AccpacErrorDto { Message = _session.Errors[i].Message, Source = _session.Errors[i].Message };
+                            returnValue = new AccpacErrorDto {Priority="SEVERE ERROR" ,Message = _session.Errors[i].Message, Source = _session.Errors[i].Message };
                             break;
 
                         case ErrorPriority.Warning:
-                            returnValue = new AccpacErrorDto { Message = _session.Errors[i].Message, Source = _session.Errors[i].Message };
+                            returnValue = new AccpacErrorDto {Priority="WARNING" ,Message = _session.Errors[i].Message, Source = _session.Errors[i].Message };
                             break;
 
                         default:
-                            returnValue = new AccpacErrorDto { Message = _session.Errors[i].Message, Source = _session.Errors[i].Message };
+                            returnValue = new AccpacErrorDto {Priority="UNSPECIFIED PRIORITY" ,Message = _session.Errors[i].Message, Source = _session.Errors[i].Message };
                             break;
 
                     }
@@ -185,7 +185,6 @@ namespace AccpacUserManagement_Wrapper.Services
                 _session.Errors.Clear();
                 return returnValue;
             }
-            return new AccpacErrorDto { Message = ex.Message, Source = "Non-Accpac Error" };
         }
 
 

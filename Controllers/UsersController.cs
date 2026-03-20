@@ -9,6 +9,7 @@ using System.Web.Mvc;
 using AccpacUserManagement_Wrapper.Models;
 using AccpacUserManagement_Wrapper.Services.Sage300Services;
 using HttpGetAttribute = System.Web.Http.HttpGetAttribute;
+using HttpPatchAttribute = System.Web.Http.HttpPatchAttribute;
 using HttpPostAttribute = System.Web.Http.HttpPostAttribute;
 using RouteAttribute = System.Web.Http.RouteAttribute;
 using RoutePrefixAttribute = System.Web.Http.RoutePrefixAttribute;
@@ -135,7 +136,80 @@ namespace AccpacUserManagement_Wrapper.Controllers
             }
         }
 
+        [HttpPatch]
+        [Route("disable/{id}")]
+        [ResponseType(typeof(void))]
+        public async Task<IHttpActionResult> disableUser(string id)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(id))
+                {
+                    return BadRequest("User ID is required");
+                }
+                //await userService.GetUserByIdAsync(id);
 
+                await userService.DisableUser(id);
+
+                return Ok();
+            }
+            catch (InvalidOperationException ex) when (ex.Message.Contains("not found"))
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
+        }
+
+
+        [HttpPatch]
+        [Route("enable/{id}")]
+        [ResponseType(typeof(void))]
+        public async Task<IHttpActionResult> enableUser(string id)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(id))
+                {
+                    return BadRequest("User ID is required");
+                }
+                //await userService.GetUserByIdAsync(id);
+
+                await userService.EnableUser(id);
+
+                return Ok();
+            }
+            catch (InvalidOperationException ex) when (ex.Message.Contains("not found"))
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
+
+        }
+
+
+        [HttpGet]
+        [Route("roles")]
+        [ResponseType(typeof(List<UserRolesDto>))]
+        public async Task<IHttpActionResult> getUserRoles()
+        {
+            try
+            {
+                var userRoles = await userService.GetUserRolesAsync();
+                return Ok(userRoles);
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
+        }
 
     }
+
+
 }

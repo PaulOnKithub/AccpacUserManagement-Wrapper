@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
+using System.Web.UI.WebControls;
 using AccpacUserManagement_Wrapper.Models;
 
 namespace AccpacUserManagement_Wrapper.Services.Sage300Services
@@ -258,7 +259,95 @@ namespace AccpacUserManagement_Wrapper.Services.Sage300Services
 
         }
 
+        public async Task DisableUser(String userID)
+        {
+            await Sage300TaskExecutor.Instance.ExecuteAsync(() =>{
+
+            Debug.WriteLine("DisableUser executing on thread: " + System.Threading.Thread.CurrentThread.ManagedThreadId);
+
+            try
+            {
+                var dbLink = Sage300SessionManager.Instance.GetSystemDBLink();
+                var view = dbLink.OpenView("AS0003");
+
+                view.Fields.FieldByName("USERID").SetValue(userID, false);
+
+                bool found = view.Read(false);
+
+                if (found)
+                {
+                    view.Fields.FieldByName("DISABLED").SetValue(1, false);
+                    view.Update();
+                }
+                else
+                {
+                     view.Dispose();
+                    throw new InvalidOperationException($"User with id {userID} not found");
+                }
+
+                view.Dispose();
+
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error disabling user: {ex.Message}");
+                var accpacError = Sage300SessionManager.Instance.accpacSessionErrorsHandler(ex);
+                throw new InvalidOperationException($"Failed to disable user with id {userID} \n Accapc Error {accpacError.ToString()}", ex);
+            }
+
+            return;
+
+            });
+        }
+
+        public async Task EnableUser(String userID)
+        {
+            await Sage300TaskExecutor.Instance.ExecuteAsync(() => {
+
+                Debug.WriteLine("EnableUser executing on thread: " + System.Threading.Thread.CurrentThread.ManagedThreadId);
+
+                try
+                {
+                    var dbLink = Sage300SessionManager.Instance.GetSystemDBLink();
+                    var view = dbLink.OpenView("AS0003");
+
+                    view.Fields.FieldByName("USERID").SetValue(userID, false);
+
+                    bool found = view.Read(false);
+
+                    if (found)
+                    {
+                        view.Fields.FieldByName("DISABLED").SetValue(0, false);
+                        view.Update();
+                    }
+                    else
+                    {
+                        view.Dispose();
+                        throw new InvalidOperationException($"User with id {userID} not found");
+                    }
+
+                    view.Dispose();
+
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Error enabling user: {ex.Message}");
+                    var accpacError = Sage300SessionManager.Instance.accpacSessionErrorsHandler(ex);
+                    throw new InvalidOperationException($"Failed to enable user with id {userID} \n Accapc Error {accpacError.ToString()}", ex);
+                }
+
+                return;
+
+            });
+        }
+
+        internal async Task<object> GetUserRolesAsync()
+        {
+            throw new NotImplementedException();
+        }
     }
+
+    
 
 
 }
